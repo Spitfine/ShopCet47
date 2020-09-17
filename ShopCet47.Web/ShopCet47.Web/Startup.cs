@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using ShopCet47.Web.Data;
 using ShopCet47.Web.Data.Entities;
 using ShopCet47.Web.Data.Repositories;
+using ShopCet47.Web.Helpers;
 
 namespace ShopCet47.Web
 {
@@ -51,7 +47,9 @@ namespace ShopCet47.Web
 
             //Vou usar a minha classe SeeDb para alimentar as tabelas da Bd
             services.AddTransient<SeedDb>();
-            services.AddScoped<IRepository, Repository>();
+            services.AddScoped<IProductRepository, ProductRepository>();
+            //services.AddScoped<ICountryRepository, CountryRepository>();
+            services.AddScoped<IUserHelper, UserHelper>();
 
             services.Configure<CookiePolicyOptions>(options =>
             {

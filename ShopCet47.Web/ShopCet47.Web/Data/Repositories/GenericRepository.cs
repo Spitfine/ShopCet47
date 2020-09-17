@@ -1,8 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Remotion.Linq.Parsing.Structure.IntermediateModel;
 using ShopCet47.Web.Data.Entities;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -24,9 +21,11 @@ namespace ShopCet47.Web.Data.Repositories
 
         public async Task<T> GetByIdAsync(int Id)
         {
-            return await _context.Set<T>().AsNoTracking().FirstOrDefaultAsync(e => e.Id == Id);
+            return await _context.Set<T>()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.Id == Id);
         }
-        
+
 
         public async Task CreateAsync(T entity)
         {
@@ -50,11 +49,11 @@ namespace ShopCet47.Web.Data.Repositories
             return await _context.Set<T>().AnyAsync(e => e.Id == Id);
         }
 
-        public  async Task<bool> SaveAllSync()
+        public async Task<bool> SaveAllSync()
         {
             return await _context.SaveChangesAsync() > 0;
         }
 
-       
+
     }
 }
