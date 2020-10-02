@@ -10,7 +10,7 @@ namespace ShopCet47.Web.Data.Repositories
         // Interface para ir buscar todos os valores a DB de uma forma generica, serve para qualquer situação com uma base de dados.
         IQueryable<T> GetAll();
 
-        Task<T> GetByIdAsync(int id);
+        Task<T> GetByIdAsync(int Id);
 
         Task CreateAsync(T entity);
 
@@ -18,7 +18,7 @@ namespace ShopCet47.Web.Data.Repositories
 
         Task DeleteAsync(T entity);
 
-        Task<bool> ExistAsync(int id);
+        Task<bool> ExistAsync(int Id);
 
     }
 }
