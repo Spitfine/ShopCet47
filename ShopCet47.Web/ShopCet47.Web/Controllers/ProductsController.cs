@@ -4,6 +4,7 @@ using ShopCet47.Web.Data.Entities;
 using ShopCet47.Web.Data.Repositories;
 using ShopCet47.Web.Helpers;
 using ShopCet47.Web.Models;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -56,7 +57,7 @@ namespace ShopCet47.Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Price,ImageFile,LastPurchase,LastSale,IsAvailable,Stock")] ProductViewModel view)
+        public async Task<IActionResult> Create(ProductViewModel view)
         {
             if (ModelState.IsValid)
             {
@@ -64,14 +65,19 @@ namespace ShopCet47.Web.Controllers
 
                 if (view.ImageFile != null && view.ImageFile.Length > 0)
                 {
-                    path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images\\Products", view.ImageFile.FileName);
+                    var guid = Guid.NewGuid().ToString();
+                    var file = $"{guid}.jpg";
+                    path = Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        "wwwroot\\images\\Products", 
+                        file);
 
                     using (var stream = new FileStream(path, FileMode.Create))
                     {
                         await view.ImageFile.CopyToAsync(stream);
                     }
 
-                    path = $"~/images/Products/{view.ImageFile.FileName}";
+                    path = $"~/images/Products/{file}";
                 }
 
                 var product = this.ToProduct(view, path);
@@ -120,7 +126,7 @@ namespace ShopCet47.Web.Controllers
             return View(view);
         }
 
-        private ProductViewModel ToProductViewModel(Product product)
+        private ProductViewModel ToProductViewModel(Product product)// todos atributos a ser chamados numa unica forma
         {
             return new ProductViewModel
             {
@@ -152,21 +158,26 @@ namespace ShopCet47.Web.Controllers
                 try
                 {
                     var path = view.ImageUrl;
+                                                           
+                         path = string.Empty;
 
-                    if (view.ImageFile != null && view.ImageFile.Length > 0)
-                    {
-                        path = Path.Combine(Directory.GetCurrentDirectory(), 
-                            "wwwroot\\images\\Products", 
-                            view.ImageFile.FileName);
-
-                        using (var stream = new FileStream(path, FileMode.Create))
+                        if (view.ImageFile != null && view.ImageFile.Length > 0)
                         {
-                            await view.ImageFile.CopyToAsync(stream);
+                            var guid = Guid.NewGuid().ToString();
+                            var file = $"{guid}.jpg";
+                            path = Path.Combine(
+                                Directory.GetCurrentDirectory(),
+                                "wwwroot\\images\\Products",
+                                file);
+
+                            using (var stream = new FileStream(path, FileMode.Create))
+                            {
+                                await view.ImageFile.CopyToAsync(stream);
+                            }
+
+                            path = $"~/images/Products/{file}";
                         }
-
-                        path = $"~/images/Products/{view.ImageFile.FileName}";
-                    }
-
+                    
                     var product = this.ToProduct(view, path);
 
                     //TODO: mudar para o user depois estiver logado
