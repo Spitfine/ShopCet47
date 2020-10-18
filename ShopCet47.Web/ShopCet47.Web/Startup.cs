@@ -48,7 +48,7 @@ namespace ShopCet47.Web
             //Vou usar a minha classe SeeDb para alimentar as tabelas da Bd
             services.AddTransient<SeedDb>();
             services.AddScoped<IProductRepository, ProductRepository>();
-            //services.AddScoped<ICountryRepository, CountryRepository>();
+            services.AddScoped<ICountryRepository, CountryRepository>();
             services.AddScoped<IUserHelper, UserHelper>();
 
             services.Configure<CookiePolicyOptions>(options =>
@@ -77,7 +77,7 @@ namespace ShopCet47.Web
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseAuthentication();
+            app.UseAuthentication();// servico para fazer as autenticacoes
             app.UseCookiePolicy();
 
             app.UseMvc(routes =>

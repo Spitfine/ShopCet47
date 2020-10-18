@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShopCet47.Web.Data.Entities;
 using ShopCet47.Web.Data.Repositories;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace ShopCet47.Web.Controllers
 {
+    
     public class ProductsController : Controller
     {
         private readonly IProductRepository _productRepository;
@@ -46,6 +48,7 @@ namespace ShopCet47.Web.Controllers
             return View(product);
         }
 
+        [Authorize]// utilizadores autenticados podem criar produtos.
         // GET: Products/Create
         public IActionResult Create()
         {
@@ -106,7 +109,9 @@ namespace ShopCet47.Web.Controllers
             };
         }
 
+
         // GET: Products/Edit/5
+        [Authorize]// utilizadores autenticados podem editar os produtos
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -201,6 +206,7 @@ namespace ShopCet47.Web.Controllers
         }
 
         // GET: Products/Delete/5
+        [Authorize]// utilizadores autenticados podem apagar os produtos
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
