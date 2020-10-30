@@ -7,22 +7,27 @@ namespace ShopCet47.Web.Helpers
 {
     public class UserHelper : IUserHelper
     {
-        private readonly UserManager<User> _userManager;
+        private readonly UserManager<User> userManager;
         private readonly SignInManager<User> signInManager;
 
         public UserHelper(UserManager<User> userManager, SignInManager<User> signInManager)
         {
-            _userManager = userManager;
+            this.userManager = userManager;
             this.signInManager = signInManager;
         }
         public async Task<IdentityResult> AddUserAsync(User user, string password)
         {
-            return await _userManager.CreateAsync(user, password);
+            return await userManager.CreateAsync(user, password);
+        }
+
+        public async Task<IdentityResult> ChangePasswordAsync(User user, string oldPassword, string newPassword)
+        {
+            return await this.userManager.ChangePasswordAsync(user, oldPassword, newPassword);
         }
 
         public async Task<User> GetUserByEmailAsync(string email)
         {
-            return await _userManager.FindByNameAsync(email);
+            return await userManager.FindByNameAsync(email);
         }
 
         public async Task<SignInResult> LoginAsync(LoginViewModel model)
@@ -38,5 +43,11 @@ namespace ShopCet47.Web.Helpers
         {
             await this.signInManager.SignOutAsync();
         }
+
+        public async Task<IdentityResult> UpdateUserAsync(User user)
+        {
+           return await this.userManager.UpdateAsync(user);
+        }
     }
+
 }
