@@ -11,6 +11,13 @@ namespace ShopCet47.Web.Data
 {
     public class DataContext : IdentityDbContext<User>
     {
+        public DbSet<Order> Orders { get; set; }
+
+        public DbSet<OrderDetail> OrderDetails { get; set; }
+
+
+        public DbSet<Order> OrdersDetailTemps { get; set; }
+
         public DataContext(DbContextOptions<DataContext> options) : base (options) //
         {
 

@@ -11,24 +11,24 @@ using System.Threading.Tasks;
 
 namespace ShopCet47.Web.Controllers
 {
-    
+
     public class ProductsController : Controller
     {
-        private readonly IProductRepository _productRepository;
-        private readonly IUserHelper _userHelper;
+        private readonly IProductRepository productRepository;
+        private readonly IUserHelper userHelper;
 
 
         public ProductsController(IProductRepository productRepository, IUserHelper userHelper)
         {
-            _productRepository = productRepository;
-            _userHelper = userHelper;
+            this.productRepository = productRepository;
+            this.userHelper = userHelper;
 
         }
 
         // GET: Products
         public IActionResult Index()
         {
-            return View(_productRepository.GetAll());
+            return View(this.productRepository.GetAll());
         }
 
         // GET: Products/Details/5
@@ -39,7 +39,7 @@ namespace ShopCet47.Web.Controllers
                 return NotFound();
             }
 
-            var product = await _productRepository.GetByIdAsync(id.Value);
+            var product = await this.productRepository.GetByIdAsync(id.Value);
             if (product == null)
             {
                 return NotFound();
@@ -50,6 +50,7 @@ namespace ShopCet47.Web.Controllers
 
         [Authorize]// utilizadores autenticados podem criar produtos.
         // GET: Products/Create
+        [Authorize(Roles ="Admin")]
         public IActionResult Create()
         {
             return View();
@@ -72,7 +73,7 @@ namespace ShopCet47.Web.Controllers
                     var file = $"{guid}.jpg";
                     path = Path.Combine(
                         Directory.GetCurrentDirectory(),
-                        "wwwroot\\images\\Products", 
+                        "wwwroot\\images\\Products",
                         file);
 
                     using (var stream = new FileStream(path, FileMode.Create))
@@ -85,9 +86,9 @@ namespace ShopCet47.Web.Controllers
 
                 var product = this.ToProduct(view, path);
 
-                
-                product.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
-                await _productRepository.CreateAsync(product);
+
+                product.User = await this.userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+                await this.productRepository.CreateAsync(product);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -111,7 +112,7 @@ namespace ShopCet47.Web.Controllers
 
 
         // GET: Products/Edit/5
-        [Authorize]// utilizadores autenticados podem editar os produtos
+        [Authorize(Roles = "Admin")]// utilizadores autenticados podem editar os produtos
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -119,7 +120,7 @@ namespace ShopCet47.Web.Controllers
                 return NotFound();
             }
 
-            var product = await _productRepository.GetByIdAsync(id.Value);
+            var product = await this.productRepository.GetByIdAsync(id.Value);
             if (product == null)
             {
                 return NotFound();
@@ -163,35 +164,35 @@ namespace ShopCet47.Web.Controllers
                 try
                 {
                     var path = view.ImageUrl;
-                                                           
-                         path = string.Empty;
 
-                        if (view.ImageFile != null && view.ImageFile.Length > 0)
+                    path = string.Empty;
+
+                    if (view.ImageFile != null && view.ImageFile.Length > 0)
+                    {
+                        var guid = Guid.NewGuid().ToString();
+                        var file = $"{guid}.jpg";
+                        path = Path.Combine(
+                            Directory.GetCurrentDirectory(),
+                            "wwwroot\\images\\Products",
+                            file);
+
+                        using (var stream = new FileStream(path, FileMode.Create))
                         {
-                            var guid = Guid.NewGuid().ToString();
-                            var file = $"{guid}.jpg";
-                            path = Path.Combine(
-                                Directory.GetCurrentDirectory(),
-                                "wwwroot\\images\\Products",
-                                file);
-
-                            using (var stream = new FileStream(path, FileMode.Create))
-                            {
-                                await view.ImageFile.CopyToAsync(stream);
-                            }
-
-                            path = $"~/images/Products/{file}";
+                            await view.ImageFile.CopyToAsync(stream);
                         }
-                    
+
+                        path = $"~/images/Products/{file}";
+                    }
+
                     var product = this.ToProduct(view, path);
 
-                    
-                    product.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
-                    await _productRepository.UpdateAsync(product);
+
+                    product.User = await this.userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+                    await this.productRepository.UpdateAsync(product);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!await _productRepository.ExistAsync(view.Id))
+                    if (!await this.productRepository.ExistAsync(view.Id))
                     {
                         return NotFound();
                     }
@@ -206,7 +207,7 @@ namespace ShopCet47.Web.Controllers
         }
 
         // GET: Products/Delete/5
-        [Authorize]// utilizadores autenticados podem apagar os produtos
+        [Authorize(Roles = "Admin")]// utilizadores autenticados podem apagar os produtos
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -214,7 +215,7 @@ namespace ShopCet47.Web.Controllers
                 return NotFound();
             }
 
-            var product = await _productRepository.GetByIdAsync(id.Value);
+            var product = await this.productRepository.GetByIdAsync(id.Value);
             if (product == null)
             {
                 return NotFound();
@@ -228,8 +229,8 @@ namespace ShopCet47.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = await _productRepository.GetByIdAsync(id);
-            await _productRepository.DeleteAsync(product);
+            var product = await this.productRepository.GetByIdAsync(id);
+            await this.productRepository.DeleteAsync(product);
             return RedirectToAction(nameof(Index));
         }
 

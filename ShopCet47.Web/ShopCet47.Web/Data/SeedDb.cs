@@ -10,23 +10,26 @@ namespace ShopCet47.Web.Data
 {
     public class SeedDb
     {
-        private readonly DataContext _context;
-        private readonly IUserHelper _userHelper;
-        private Random _random;
+        private readonly DataContext context;
+        private readonly IUserHelper userHelper;
+        private Random random;
 
 
         public SeedDb(DataContext context, IUserHelper userHelper)
         {
-            _context = context;
-            _userHelper = userHelper;
-            _random = new Random();
+            this.context = context;
+            this.userHelper = userHelper;
+            random = new Random();
         }
 
         public async Task SeedAsync()
         {
-            await _context.Database.EnsureCreatedAsync();
+            await this.context.Database.EnsureCreatedAsync();
 
-            var user = await _userHelper.GetUserByEmailAsync("carlosmspa@netcabo.pt");
+            await this.userHelper.CheckRoleAsync("Admin");
+            await this.userHelper.CheckRoleAsync("Customer");
+
+            var user = await this.userHelper.GetUserByEmailAsync("carlosmspa@netcabo.pt");
             if (user == null)
             {
                 user = new User
@@ -37,31 +40,40 @@ namespace ShopCet47.Web.Data
                     UserName = "carlosmspa@netcabo.pt"
 
                 };
-                var result = await _userHelper.AddUserAsync(user,"123456");
+                var result = await this.userHelper.AddUserAsync(user,"123456");
                 if(result != IdentityResult.Success)
                 {
                     throw new InvalidOperationException("Could not create the user in seeder");
                 }
+
+                await this.userHelper.AddUserToRoleAsync(user, "Admin");
             }
 
-            if (!_context.Products.Any())
+            var isRole = await this.userHelper.IsUserInRoleAsync(user, "Admin");
+
+            if (!isRole)
+            {
+                await this.userHelper.AddUserToRoleAsync(user, "Admin");
+            }
+
+            if (!this.context.Products.Any())
             {
                 this.AddProduct("iPhone X", user);
                 this.AddProduct("Rato Mickey", user);
                 this.AddProduct("iWatch Series 4", user);
                 this.AddProduct("Ipad 2", user);
-                await _context.SaveChangesAsync();
+                await this.context.SaveChangesAsync();
 
             }
         }
         private void AddProduct(string name, User user)
         {
-            _context.Products.Add(new Entities.Product
+            this.context.Products.Add(new Entities.Product
             {
                 Name = name,
-                Price = _random.Next(1000),
+                Price = this.random.Next(1000),
                 IsAvailable = true,
-                Stock = _random.Next(100),
+                Stock = this.random.Next(100),
                 User = user
             });
         }
